@@ -1,4 +1,4 @@
-import { _decorator, Component, Director, director, find, game, Game, Sprite, UITransform } from 'cc';
+import { _decorator, Component, director, find, Sprite, UITransform } from 'cc';
 const { ccclass, property } = _decorator;
 
 @ccclass('GameManager')
@@ -36,6 +36,7 @@ export class GameManager extends Component {
 
         this.BG.getComponent(UITransform).contentSize.set(canvas.contentSize.x,canvas.contentSize.y);
     }
+
 }
 
 
