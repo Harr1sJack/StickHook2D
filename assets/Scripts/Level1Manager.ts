@@ -64,14 +64,12 @@ export class Level1Manager extends Component {
     Won()
     {
         console.log("Won");
-        //this.player.rigidBody.type = ERigidBody2DType.Static; 
         this.youWon.active = true;
     }
 
     GameOver()
     {
         console.log("GameOver");
-        //this.player.rigidBody.type = ERigidBody2DType.Static; 
         this.gameOver.active = true;
     }
 

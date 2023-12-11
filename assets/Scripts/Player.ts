@@ -1,4 +1,4 @@
-import { _decorator, Component, Input, input, EventKeyboard, KeyCode, RigidBody2D, DistanceJoint2D, CircleCollider2D, Node, Vec3, Vec2, Quat, misc, EventTouch} from 'cc';
+import { _decorator, Component, Input, input, RigidBody2D, DistanceJoint2D, CircleCollider2D, Node, Vec3, Vec2, misc, EventTouch, math} from 'cc';
 const { ccclass, property } = _decorator;
 
 enum PlayerState{
@@ -13,12 +13,14 @@ export class Player extends Component {
     })
     private rope: Node;
 
+    private playerState: PlayerState = PlayerState.idle;
+
     public anchor: RigidBody2D;
     public rigidBody: RigidBody2D;
 
     private distanceJoint: DistanceJoint2D;
     private circleCollider: CircleCollider2D;
-    private playerState: PlayerState = PlayerState.idle;
+
     private crntAnchor: Node;
 
     onLoad() {
@@ -35,7 +37,7 @@ export class Player extends Component {
 
         if(this.playerState == PlayerState.Swinging)
         {
-            //this.SwingRope(dt);
+            this.SwingRope(dt);
         } 
 
     }
@@ -54,6 +56,7 @@ export class Player extends Component {
     {
         if(this.anchor != null)
         {
+            this.rope.active = true;
             this.crntAnchor = this.anchor.node;
             this.distanceJoint.connectedBody = this.anchor;
             this.distanceJoint.enabled = true;
@@ -63,14 +66,19 @@ export class Player extends Component {
 
     SwingRope(dt: number)
     {
-        this.rope.position = this.crntAnchor.position.add(this.node.position).divide3f(2,2,2);
-        console.log(Vec3.dot(this.crntAnchor.position.normalize(),this.node.position.normalize()));
-        //this.rope.setRotationFromEuler(new Vec3(0,0,misc.radiansToDegrees(Vec2.angle(this.crntAnchor.getPosition(),this.node.getPosition()))));
-        //console.log(misc.radiansToDegrees(Vec2.angle(this.node.getPosition(),this.crntAnchor.getPosition())));
+        this.rope.position = this.node.position;
+
+        var dir:Vec3 = this.node.position.subtract(this.crntAnchor.position);
+        var angleDeg:number = misc.radiansToDegrees(Math.atan2(dir.y,dir.x));
+
+        this.rope.setRotationFromEuler(new Vec3(0,0,angleDeg + 90));
+        this.rope.setScale(new Vec3(1,Vec3.len(dir)/10,0));
+        this.rigidBody.applyForce(this.rigidBody.linearVelocity,new Vec2(this.node.position.x,this.node.position.y),true);
     }
 
     ReleaseHook()
     {
+        this.rope.active = false;
         this.crntAnchor = null;
         this.distanceJoint.connectedBody = null;
         this.distanceJoint.enabled = false;
